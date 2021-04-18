@@ -55,6 +55,8 @@ class Settings extends StatelessWidget {
             onTap: (){
               checkLocationPermission();
               if(checkLocation == true)
+                return null;
+              else
                 askLocationPermission();
             },
             child: ListTile(

@@ -39,7 +39,11 @@ class _HomeViewState extends State<HomeView> {
                       ],
                     ),
                   ),
-
+                  SizedBox(height: 10,),
+                  Text("User ID: $userName",
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),)
                 ],
               ) ,
               decoration: BoxDecoration(
@@ -59,15 +63,27 @@ class _HomeViewState extends State<HomeView> {
                 Icons.send,
               ),
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> Send(userName: userName,)));
+                checkLocationEnabled();
+                if(checkLocationService == true)
+                  return null;
+                else
+                  enableLocationServices().then((value)=>
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> Send(userName: userName,))));
               },
             ),
             ListTile(
-              title: Text('Recieve Files'),
-              trailing: Icon(
-                Icons.login,
-              ),
-              onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (context)=> Receive())),
+                title: Text('Recieve Files'),
+                trailing: Icon(
+                  Icons.login,
+                ),
+                onTap: (){
+                  checkLocationEnabled();
+                  if(checkLocationService == true)
+                    return null;
+                  else
+                    enableLocationServices().then((value)=>
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Receive(userName: userName,))));
+                }
             ),
             ListTile(
               title: Text('Settings'),
@@ -89,20 +105,21 @@ class _HomeViewState extends State<HomeView> {
           children: [
             Row(
               children: [
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.orangeAccent,
-                      radius: 60,
-                      child: Text(userName, style: TextStyle(
-                          fontSize:  40, fontWeight: FontWeight.bold
-                      ),) ,
-
-                    ),
-                  ],
+                Padding(
+                  padding: EdgeInsets.only(top:10, left: 15),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.orangeAccent,
+                    radius: 60,
+                    child: Text(userName,
+                      style: TextStyle(
+                          fontSize:  40,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ) ,
+                  ),
                 ),
                 SizedBox(width: 70,),
-                Text("User name: $userName", style: TextStyle(
+                Text("User ID: $userName", style: TextStyle(
                   fontSize: 25,
 
                 ),)
@@ -112,6 +129,8 @@ class _HomeViewState extends State<HomeView> {
             FlatButton(onPressed: () {
               checkLocationEnabled();
               if(checkLocationService == true)
+                return null;
+              else
                 enableLocationServices().then((value)=>
                     Navigator.push(context, MaterialPageRoute(builder: (context)=> Send(userName: userName,))));
             },
@@ -128,7 +147,15 @@ class _HomeViewState extends State<HomeView> {
 
             ),
             SizedBox(height: 80,),
-            FlatButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=> Receive())),
+            FlatButton(onPressed: (){
+              checkLocationEnabled();
+              if(checkLocationService == true)
+                return null;
+              else
+                enableLocationServices().then((value){
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Receive(userName: userName,)));
+                });
+            },
               child: Text("Receive", style: TextStyle(
                   fontSize: 30,
                   color: Colors.white

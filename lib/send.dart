@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:nearby_connections/nearby_connections.dart';
 import 'dart:typed_data';
@@ -56,6 +57,22 @@ class _SendState extends State<Send> {
                 stopDiscovery();
               },
                 child: Text("Stop Discovering", style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.white
+                ),),
+                minWidth: 250,
+                color: Colors.pink,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(70),
+                ),
+                height: 150,
+
+              ),
+              SizedBox(height: 50,),
+              FlatButton(onPressed: (){
+                sendFile();
+              },
+                child: Text("Send File", style: TextStyle(
                     fontSize: 30,
                     color: Colors.white
                 ),),
@@ -131,7 +148,7 @@ class _SendState extends State<Send> {
   }
   stopDiscovery()async {
     await Nearby().stopDiscovery();
-    await Nearby().stopAllEndpoints();
+    await Nearby().stopAllEndpoints().then((value) =>  showSnackbar("Discovery mode stopped"));
     setState(() {
       endpointMap.clear();
     });
@@ -234,6 +251,24 @@ class _SendState extends State<Send> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(a.toString()),
     ));
+  }
+
+  sendFile() async
+  {
+    FilePickerResult? file =
+        await FilePicker.platform.pickFiles(type: FileType.any);
+    if (file == null) return;
+
+    for (MapEntry<String, ConnectionInfo> m
+    in endpointMap.entries) {
+      int payloadId =
+          await Nearby().sendFilePayload(m.key, file.files.single.path.toString());
+      showSnackbar("Sending file to ${m.key}");
+      Nearby().sendBytesPayload(
+          m.key,
+          Uint8List.fromList(
+              "$payloadId:${file.files.single.path.toString().split('/').last}".codeUnits));
+    }
   }
 
 }
